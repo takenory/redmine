@@ -207,6 +207,28 @@ class JournalsControllerTest < ActionController::TestCase
     assert_include 'journal-2-notes', response.body
   end
 
+  def test_update_xhr_with_private_notes_checked
+    @request.session[:user_id] = 1
+    xhr :post, :update, :id => 2, :private_notes => '1'
+    assert_response :success
+    assert_template 'update'
+    assert_equal 'text/javascript', response.content_type
+    assert_equal true, Journal.find(2).private_notes
+    assert_include 'change-2', response.body
+    assert_include 'journal-2-private_notes', response.body
+  end
+
+  def test_update_xhr_with_private_notes_unchecked
+    @request.session[:user_id] = 1
+    xhr :post, :update, :id => 2
+    assert_response :success
+    assert_template 'update'
+    assert_equal 'text/javascript', response.content_type
+    assert_equal false, Journal.find(2).private_notes
+    assert_include 'change-2', response.body
+    assert_include 'journal-2-private_notes', response.body
+  end
+
   def test_update_xhr_with_empty_notes_should_delete_the_journal
     @request.session[:user_id] = 1
     assert_difference 'Journal.count', -1 do

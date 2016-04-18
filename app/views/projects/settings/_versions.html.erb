@@ -1,3 +1,17 @@
+<%= form_tag(settings_project_path(:tab => 'versions'), :method => :get) do %>
+<fieldset><legend><%= l(:label_filter_plural) %></legend>
+<label for='status'><%= l(:field_status) %>:</label>
+<%#= select_tag 'status', users_status_options_for_select(@status || nil), :class => "small", :onchange => "this.form.submit(); return false;"  %>
+<%= select_tag :status, options_for_select(Version::VERSION_STATUSES.collect {|s| [l("version_status_#{s}"), s]}), :onchange => "this.form.submit(); return false;"  %>
+
+<label for='name'><%= l(:label_version) %>:</label>
+<%= text_field_tag 'name', params[:name], :size => 30 %>
+<%= submit_tag l(:button_apply), :class => "small", :name => nil %>
+<%= link_to l(:button_clear), users_path, :class => 'icon icon-reload' %>
+</fieldset>
+<% end %>
+&nbsp;
+
 <% if @project.shared_versions.any? %>
 <table class="list versions">
   <thead><tr>

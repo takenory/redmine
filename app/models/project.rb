@@ -453,7 +453,7 @@ class Project < ActiveRecord::Base
   end
 
   # Returns a scope of the Versions used by the project
-  def shared_versions
+  def shared_versions(conditions = nil)
     if new_record?
       Version.
         joins(:project).
@@ -473,6 +473,11 @@ class Project < ActiveRecord::Base
                     " OR (#{Project.table_name}.lft > #{lft} AND #{Project.table_name}.rgt < #{rgt} AND #{Version.table_name}.sharing = 'hierarchy')" +
                   "))")
       end
+      if conditions.is_a?(Hash) && conditions.any?
+        @shared_versions = @shared_versions.where("#{Version.table_name}.status IN (?)", conditions[:status]) if conditions[:status].is_a?(Array)
+        @shared_versions = @shared_versions.where("#{Version.table_name}.name LIKE ?", "%#{conditions[:name]}%") if conditions[:name].present?
+      end
+      @shared_versions
     end
   end
 

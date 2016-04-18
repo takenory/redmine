@@ -160,6 +160,9 @@ class ProjectsController < ApplicationController
     @issue_custom_fields = IssueCustomField.sorted.to_a
     @issue_category ||= IssueCategory.new
     @member ||= @project.members.new
+    @versions ||= @project.shared_versions(params[:version])
+    @version_status = params[:version] && params[:version][:status]
+    @version_name = params[:version] && params[:version][:name]
     @trackers = Tracker.sorted.to_a
     @wiki ||= @project.wiki || Wiki.new(:project => @project)
   end

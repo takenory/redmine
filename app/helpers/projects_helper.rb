@@ -100,6 +100,16 @@ module ProjectsHelper
     l("label_version_sharing_#{sharing}")
   end
 
+  def version_status_check_group(checked_status)
+    checked_status ||= Version::VERSION_STATUSES
+    content = "<label for='version[status]'>#{l(:field_status)}:</label>"
+    Version::VERSION_STATUSES.each do |s|
+      content += check_box_tag('version[status][]', s, checked_status.include?(s), :id => "version_status_#{s}", :onchange => "this.form.submit(); return false;")
+      content += content_tag('label', l("version_status_#{s}"), :for => "version_status_#{s}")
+    end
+    content.html_safe
+  end
+
   def render_api_includes(project, api)
     api.array :trackers do
       project.trackers.each do |tracker|

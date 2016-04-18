@@ -633,6 +633,32 @@ class ProjectTest < ActiveSupport::TestCase
     assert_include v, Project.new.shared_versions
   end
 
+   def test_shared_versions_with_status_conditions_should_returns_filterd_versions
+     p = Project.find(5)
+     Version.update_all(:status => 'closed')
+     open_version = Version.create!(:name => 'open version', :project => p, :status => 'open')
+     locked_version = Version.create!(:name => 'locked version', :project => p, :status => 'locked')
+
+     versions = p.shared_versions(:status => ['open', 'locked'])
+     assert_equal 2, versions.size
+     assert_include open_version, versions
+     assert_include locked_version, versions
+   end
+
+   def test_shared_versions_with_name_conditions_should_returns_filterd_versions
+     p = Project.find(5)
+     Version.update_all(:name => 'unmatch versoin')
+     open_version = Version.create!(:name => 'version first open', :project => p, :status => 'open')
+     locked_version = Version.create!(:name => 'second version locked', :project => p, :status => 'locked')
+     closed_version = Version.create!(:name => 'last closed version', :project => p, :status => 'closed')
+
+     versions = p.shared_versions(:name => 'version')
+     assert_equal 3, versions.size
+     assert_include open_version, versions
+     assert_include locked_version, versions
+     assert_include locked_version, versions
+   end
+
   def test_next_identifier
     ProjectCustomField.delete_all
     Project.create!(:name => 'last', :identifier => 'p2008040')

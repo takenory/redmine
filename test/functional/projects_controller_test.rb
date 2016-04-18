@@ -423,6 +423,16 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_template 'settings'
   end
 
+  def test_settings_with_version_parameters_should_assigns_matched_versions
+    @request.session[:user_id] = 2 # manager
+    version_parameters = {:status => ['open']}
+    get :settings, :id => 1, :version => version_parameters
+    assert_response :success
+    assert_template 'settings'
+    assert assigns(:versions)
+    assert_equal Project.find(1).shared_versions(version_parameters), assigns(:versions)
+  end
+
   def test_settings_of_subproject
     @request.session[:user_id] = 2
     get :settings, :id => 'private-child'

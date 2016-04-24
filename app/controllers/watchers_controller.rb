@@ -31,6 +31,7 @@ class WatchersController < ApplicationController
 
   def new
     @users = users_for_new_watcher
+    @groups =  groups_for_new_watcher
   end
 
   def create
@@ -125,6 +126,16 @@ class WatchersController < ApplicationController
       users -= @watchables.first.watcher_users
     end
     users
+  end
+
+  def groups_for_new_watcher
+    scope = nil
+    if params[:q].blank? && @project.present?
+      groups = @project.memberships.select {|m| m.principal.is_a?(Group)}
+    else
+      groups = Group.all.limit(100)
+    end
+    groups 
   end
 
   def find_objets_from_params

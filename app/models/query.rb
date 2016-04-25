@@ -783,7 +783,7 @@ class Query < ActiveRecord::Base
             sql = "#{db_table}.#{db_field} BETWEEN #{value.first.to_f - 1e-5} AND #{value.first.to_f + 1e-5}"
           end
         else
-          sql = "#{db_table}.#{db_field} IN (" + value.collect{|val| "'#{self.class.connection.quote_string(val)}'"}.join(",") + ")"
+          sql = queried_class.send(:sanitize_sql_for_conditions, ["#{db_table}.#{db_field} IN (?)", value])
         end
       else
         # IN an empty set
@@ -791,7 +791,7 @@ class Query < ActiveRecord::Base
       end
     when "!"
       if value.any?
-        sql = "(#{db_table}.#{db_field} IS NULL OR #{db_table}.#{db_field} NOT IN (" + value.collect{|val| "'#{self.class.connection.quote_string(val)}'"}.join(",") + "))"
+        sql = queried_class.send(:sanitize_sql_for_conditions, ["(#{db_table}.#{db_field} IS NULL OR #{db_table}.#{db_field} NOT IN (?))", value])
       else
         # NOT IN an empty set
         sql = "1=1"
@@ -909,8 +909,8 @@ class Query < ActiveRecord::Base
 
   # Returns a SQL LIKE statement with wildcards
   def sql_contains(db_field, value, match=true)
-    value = "'%#{self.class.connection.quote_string(value.to_s)}%'"
-    Redmine::Database.like(db_field, value, :match => match)
+    queried_class.send :sanitize_sql_for_conditions,
+      [Redmine::Database.like(db_field, '?', :match => match), "%#{value}%"]
   end
 
   # Adds a filter for the given custom field

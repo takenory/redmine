@@ -219,6 +219,7 @@ class JournalsControllerTest < ActionController::TestCase
   end
 
   def test_update_xhr_with_private_notes_unchecked
+    Journal.find(2).update_attributes(:private_notes => true)
     @request.session[:user_id] = 1
     xhr :post, :update, :id => 2
     assert_response :success

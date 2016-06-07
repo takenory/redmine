@@ -194,7 +194,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def image?
-    !!(self.filename =~ /\.(bmp|gif|jpg|jpe|jpeg|png)$/i)
+    MimeMagic.by_path(self.filename).image?
   end
 
   def thumbnailable?
@@ -234,11 +234,19 @@ class Attachment < ActiveRecord::Base
   end
 
   def is_text?
-    Redmine::MimeType.is_type?('text', filename)
+    MimeMagic.by_path(filename).text?
   end
 
   def is_image?
-    Redmine::MimeType.is_type?('image', filename)
+    MimeMagic.by_path(filename).image?
+  end
+
+  def is_video?
+    MimeMagic.by_path(filename).video?
+  end
+
+  def is_audio?
+    MimeMagic.by_path(filename).audio?
   end
 
   def is_diff?

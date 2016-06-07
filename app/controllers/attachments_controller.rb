@@ -42,6 +42,10 @@ class AttachmentsController < ApplicationController
           render :action => 'file'
         elsif @attachment.is_image?
           render :action => 'image'
+        elsif @attachment.is_video?
+          render :action => 'video'
+        elsif @attachment.is_audio?
+          render :action => 'audio'
         else
           render :action => 'other'
         end
